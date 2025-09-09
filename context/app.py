@@ -12,16 +12,15 @@ from dotenv import load_dotenv
 import os
 import asyncio
 
-# ✅ Environment Setup
 load_dotenv()
 set_tracing_disabled(disabled=True)
+
 
 # 🔑 API KEY Setup
 API_KEY = os.environ.get("GEMINI_API_KEY")
 if not API_KEY:
     raise KeyError("Error 405: API key not found")
 
-# 🌐 Gemini Client
 client = AsyncOpenAI(
     api_key=API_KEY,
     base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
@@ -32,7 +31,7 @@ model = OpenAIChatCompletionsModel(
     openai_client=client,
 )
 
-# 📅 Calendar Reminder Schema
+# 📅 Custom Context for Calendar Reminders
 @dataclass
 class CalendarReminder:
     title: str
@@ -41,7 +40,7 @@ class CalendarReminder:
     location: str
     description: str
 
-# 🛠️ Tool: Fetch calendar reminder
+# 🛠️ Tool to fetch calendar reminder
 @function_tool
 async def get_calendar_reminder(ctx: RunContextWrapper[CalendarReminder]) -> str:
     """
@@ -56,27 +55,9 @@ async def get_calendar_reminder(ctx: RunContextWrapper[CalendarReminder]) -> str
         f"📝 Notes: {reminder.description}"
     )
 
-
-# 🧠 Shallow vs Deep Type Explanation
-"""
-👉 Shallow Type:
-   - Sirf basic data structures ko define karta hai (surface-level).
-   - Example: str, int, list, dict.
-   - Agar hum CalendarReminder ko simple dictionary bana dete:
-        reminder = {"title": "Meeting", "date": "2025-08-25"}
-     Yeh SHALLOW type hai, kyunki validation aur structure enforce nahi hota.
-
-👉 Deep Type:
-   - Proper schema / dataclass banake strong typing deta hai.
-   - Har attribute ka type fix hota hai (string, date, etc).
-   - Example: @dataclass CalendarReminder jisme title, date, time fields fix hain.
-   - Yeh enforce karta hai ke reminder hamesha correct structure follow kare.
-   - Agents SDK mein deep type helpful hota hai taake model ko structured context mile.
-"""
-
-# 🚀 Main Function
+# 🚀 Main function
 async def main():
-    # Example Calendar Reminder Data (Deep Type - dataclass based)
+    # Example Calendar Reminder Data
     reminder = CalendarReminder(
         title="Project Meeting",
         date="2025-08-25",
@@ -101,7 +82,6 @@ async def main():
 
     # Print Result
     print(result.final_output)
-
 
 # ⏳ Entry Point
 if __name__ == "__main__":
